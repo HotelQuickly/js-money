@@ -42,7 +42,7 @@ var someDollars = Money.fromDecimal(15.25, 'USD');
 var someMoreDollars = Money.fromDecimal(15.12345, 'USD', Math.ceil);
 
 // the following will fail and throw an Error since USD allows for 2 decimals
-var moreDollars = Money.fromDecimal(15.3456, Money.USD);
+var moreDollars = Money.fromDecimalRounded(15.3456, Money.USD);
 ```
 
 The currency object hold the following properties
