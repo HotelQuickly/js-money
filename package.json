@@ -1,7 +1,7 @@
 {
     "name": "@hotelquickly/js-money",
     "description": "JavaScript implementation of the Money value object.",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "main": "./lib",
     "author": {
         "name": "David Kalosi",
