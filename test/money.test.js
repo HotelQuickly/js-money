@@ -48,14 +48,14 @@ describe('Money', function () {
         }).to.throw(Error);
     });
 
-    it('should create a new instance from decimal using `.fromDecimalRounded()` even if too many decimal places', function () {
-        var money = Money.fromDecimalRounded(10.01, Money.EUR, 'ceil');
-        var money1 = Money.fromDecimalRounded({amount: 10.01, currency: 'EUR'}, Math.ceil);
-        var money2 = Money.fromDecimalRounded(10.0101, Money.EUR, Math.ceil);
-        var money3 = Money.fromDecimalRounded(10.0199, Money.EUR, Math.ceil);
-        var money4 = Money.fromDecimalRounded(10.0199, Money.EUR, Math.floor);
-        var money5 = Money.fromDecimalRounded(10.0199, Money.EUR, Math.round);
-        var money6 = Money.fromDecimalRounded(10.0199, Money.EUR, function (amount) {
+    it('should create a new instance from decimal using `.fromDecimal()` even if too many decimal places if rounder function provided', function () {
+        var money = Money.fromDecimal(10.01, Money.EUR, 'ceil');
+        var money1 = Money.fromDecimal({amount: 10.01, currency: 'EUR'}, Math.ceil);
+        var money2 = Money.fromDecimal(10.0101, Money.EUR, Math.ceil);
+        var money3 = Money.fromDecimal(10.0199, Money.EUR, Math.ceil);
+        var money4 = Money.fromDecimal(10.0199, Money.EUR, Math.floor);
+        var money5 = Money.fromDecimal(10.0199, Money.EUR, Math.round);
+        var money6 = Money.fromDecimal(10.0199, Money.EUR, function (amount) {
             return Math.round(amount)
         });
 
@@ -290,11 +290,13 @@ describe('Money', function () {
         var forint = Money.fromDecimal(123.45, 'HUF');
         var yen = Money.fromDecimal(12345, 'JPY');
         var dinar = Money.fromDecimal(12.345, 'BHD');
+        var bitcoin = Money.fromDecimal(0.00012345, 'BTC')
 
         expect(euro.amount).to.equal(12345);
         expect(forint.amount).to.equal(12345);
         expect(yen.amount).to.equal(12345);
         expect(dinar.amount).to.equal(12345);
+        expect(bitcoin.amount).to.equal(12345);
     });
 
     it('should convert to decimal per currency', function () {
@@ -302,20 +304,38 @@ describe('Money', function () {
         var forint = new Money(12345, 'HUF');
         var yen = new Money(12345, 'JPY');
         var dinar = new Money(12345, 'BHD');
+        var bitcoin = new Money(12345, 'BTC');
 
         expect(euro.toDecimal()).to.equal(123.45);
         expect(forint.toDecimal()).to.equal(123.45);
         expect(yen.toDecimal()).to.equal(12345);
         expect(dinar.toDecimal()).to.equal(12.345);
+        expect(bitcoin.toDecimal()).to.equal(0.00012345);
     });
 
     it('should convert from decimal when using less than maximum decimal digits', function () {
         var euro = Money.fromDecimal(123, 'EUR');
         var forint = Money.fromDecimal(123.4, 'HUF');
         var dinar = Money.fromDecimal(12.3, 'BHD');
+        var bitcoin = Money.fromDecimal(0.000125, 'BTC');
 
         expect(euro.amount).to.equal(12300);
         expect(forint.amount).to.equal(12340);
         expect(dinar.amount).to.equal(12300);
+        expect(bitcoin.amount).to.equal(12500);
+    });
+
+    it('should convert maximum available value to decimal for currencies with many positions', function () {
+        var almostMaxBitcoin = new Money(2099999999999999, 'BTC');
+        var maxBitcoin = new Money(2100000000000000, 'BTC');
+
+        expect(almostMaxBitcoin.toDecimal()).to.equal(20999999.99999999)
+        expect(maxBitcoin.toDecimal()).to.equal(21000000.0)
+    });
+
+    it('should convert minimum available value to decimal for currencies with many positions', function () {
+        var minBitcoin = new Money(1, 'BTC');
+
+        expect(minBitcoin.toDecimal()).to.equal(0.00000001)
     });
 });
